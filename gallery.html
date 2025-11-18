@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lamp Gallery</title>
+    <script type="module">
+        import { init } from "https://esm.sh/playhtml@0.1.18";
+        init();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .switches-panel {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            z-index: 100;
+        }
+
+        .light-switch {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .light-switch:hover {
+            transform: scale(1.05);
+        }
+
+        /* Style 2: Rocker Switch for Lamp 1 */
+        #switch1 {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            border-radius: 8px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #switch1 .rocker-button {
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(145deg, #d0d0d0, #e0e0e0);
+            position: absolute;
+            transition: all 0.3s;
+        }
+
+        #switch1 .rocker-top {
+            top: 0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        #switch1 .rocker-bottom {
+            bottom: 0;
+            border-radius: 0 0 8px 8px;
+        }
+
+        #switch1.toggled-on .rocker-top {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Style 3: Push Button for Lamp 2 */
+        #switch2 {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            border-radius: 50%;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        #switch2::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #c0c0c0, #d4d4d4);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        #switch2.toggled-on::after {
+            background: linear-gradient(145deg, #ffd700, #ffed4e);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15), 0 0 20px rgba(255,215,0,0.6);
+        }
+
+        #switch2:active {
+            transform: scale(0.95);
+        }
+
+        /* Style 5: Lever Switch for Lamp 3 */
+        #switch3 {
+            width: 60px;
+            height: 120px;
+            background: #f0f0f0;
+            border-radius: 30px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        #switch3 .lever {
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(145deg, #d0d0d0, #e8e8e8);
+            border-radius: 20px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+            transition: top 0.3s, background 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        #switch3.toggled-on .lever {
+            top: 50px;
+            background: linear-gradient(145deg, #4CAF50, #66BB6A);
+        }
+
+        .lamps-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .lamp {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+        }
+
+        .lamp img {
+            width: 300px;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+        
+        /* Initial positioning for lamps */
+        #lamp1 {
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #lamp2 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #lamp3 {
+            top: 50%;
+            left: 70%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Hide the off image by default */
+        .lamp .lamp-off {
+            display: none;
+        }
+
+        /* When toggled on, show the off image and hide the on image */
+        .lamp.toggled-on .lamp-on {
+            display: none;
+        }
+
+        .lamp.toggled-on .lamp-off {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Light Switches Panel -->
+        <div class="switches-panel">
+            <!-- Switch 1 -->
+            <div id="switch1" class="light-switch" can-toggle data-target="lamp1">
+                <div class="switch-button"></div>
+                <div class="switch-button"></div>
+            </div>
+
+            <!-- Switch 2 -->
+            <div id="switch2" class="light-switch" can-toggle data-target="lamp2">
+                <div class="switch-button"></div>
+                <div class="switch-button"></div>
+            </div>
+
+            <!-- Switch 3 -->
+            <div id="switch3" class="light-switch" can-toggle data-target="lamp3">
+                <div class="switch-button"></div>
+                <div class="switch-button"></div>
+            </div>
+        </div>
+
+        <!-- Lamps arranged horizontally -->
+        <div class="lamps-container">
+            <!-- Lamp 1 -->
+            <div id="lamp1" class="lamp" can-move>
+                <img class="lamp-on" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp1-on.jpg" alt="Lamp 1 On">
+                <img class="lamp-off" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp1-off.jpg" alt="Lamp 1 Off">
+            </div>
+
+            <!-- Lamp 2 -->
+            <div id="lamp2" class="lamp" can-move>
+                <img class="lamp-on" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp2-on.jpg" alt="Lamp 2 On">
+                <img class="lamp-off" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp2-off.jpg" alt="Lamp 2 Off">
+            </div>
+
+            <!-- Lamp 3 -->
+            <div id="lamp3" class="lamp" can-move>
+                <img class="lamp-on" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp3-on.jpg" alt="Lamp 3 On">
+                <img class="lamp-off" src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/lamps/lamp3-off.jpg" alt="Lamp 3 Off">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for playhtml to initialize
+        setTimeout(() => {
+            // Sync switch toggles with lamp toggles
+            document.querySelectorAll('.light-switch').forEach(switchEl => {
+                const targetLampId = switchEl.getAttribute('data-target');
+                const targetLamp = document.getElementById(targetLampId);
+                
+                if (targetLamp) {
+                    // Listen for clicks on the switch
+                    switchEl.addEventListener('click', () => {
+                        // Small delay to let playhtml toggle the switch first
+                        setTimeout(() => {
+                            // Check if switch is toggled on
+                            if (switchEl.classList.contains('toggled-on')) {
+                                targetLamp.classList.add('toggled-on');
+                            } else {
+                                targetLamp.classList.remove('toggled-on');
+                            }
+                        }, 10);
+                    });
+                }
+            });
+        }, 100);
+    </script>
+</body>
+</html>
